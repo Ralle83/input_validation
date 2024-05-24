@@ -1,55 +1,92 @@
 import 'package:flutter/material.dart';
+import 'package:input_validation/validate.dart';
 
-class FormScreen extends StatelessWidget {
-  // Attribute
-  // (keine)
+void main() => runApp(MyApp());
 
-  // Konstruktor
-  const FormScreen({super.key});
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Input Validation',
+      home: MyHomePage(),
+    );
+  }
+}
 
-  // Methoden
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _validateInputs() {
+    if (_formKey.currentState!.validate()) {
+      // If all data are correct then save data to out variables
+      _formKey.currentState!.save();
+      // Do something with the validated input
+    } else {
+      // If all data are not valid then start auto validation.
+      setState(() {
+        // Trigger the auto validation
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Input Validation'),
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
-          child: Column(children: [
-            TextFormField(
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                label: Text("Email"),
+          key: _formKey,
+          child: Column(
+            children: <Widget>[
+              TextFormField(
+                controller: _emailController,
+                decoration: InputDecoration(labelText: 'Email'),
+                validator: (value) {
+                  if (validateEmail(value ?? '')) {
+                    return null;
+                  } else {
+                    return 'Enter a valid email';
+                  }
+                },
               ),
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: validateEmail,
-            ),
-            const SizedBox(height: 8),
-            TextFormField(
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                label: Text("Passwort"),
+              TextFormField(
+                controller: _passwordController,
+                decoration: InputDecoration(labelText: 'Password'),
+                obscureText: true,
+                validator: (value) {
+                  if (validatePw(value ?? '')) {
+                    return null;
+                  } else {
+                    return 'Enter a valid password';
+                  }
+                },
               ),
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: validatePw,
-            ),
-            const SizedBox(height: 32),
-            FilledButton(
-              onPressed: () {},
-              child: const Text("Login"),
-            ),
-          ]),
+              SizedBox(height: 20.0),
+              ElevatedButton(
+                onPressed: _validateInputs,
+                child: Text('Validate'),
+              ),
+            ],
+          ),
         ),
       ),
     );
-  }
-
-  String? validateEmail(String? input) {
-    // TODO: implementiere hier die Logik, die im Task Sheet beschrieben ist
-    return null;
-  }
-
-  String? validatePw(String? input) {
-    // TODO: implementiere hier die Logik, die im Task Sheet beschrieben ist
-    return null;
   }
 }
